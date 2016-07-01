@@ -4,7 +4,6 @@ class phantomjs (
   $source_url = undef,
   $source_dir = '/opt',
   $install_dir = '/usr/local/bin',
-  $package_update = false,
   $timeout = 300
 ) {
 
@@ -57,24 +56,18 @@ class phantomjs (
   }
 
   exec { 'get phantomjs':
-    command => "/usr/bin/curl --silent --show-error --fail --location ${pkg_src_url} --output ${source_dir}/phantomjs.tar.bz2 \
-      && mkdir ${source_dir}/phantomjs \
-      && tar --extract --file=${source_dir}/phantomjs.tar.bz2 --strip-components=1 --directory=${source_dir}/phantomjs",
-    creates => "${source_dir}/phantomjs/",
+    command => "/usr/bin/curl --silent --show-error --fail --location ${pkg_src_url} --output ${source_dir}/phantomjs-${package_version}.tar.bz2 \
+      && mkdir ${source_dir}/phantomjs-${package_version} \
+      && tar --extract --file=${source_dir}/phantomjs-${package_version}.tar.bz2 --strip-components=1 --directory=${source_dir}/phantomjs-${package_version}",
+    creates => "${source_dir}/phantomjs-${package_version}/",
     require => $packages,
     timeout => $timeout
   }
 
   file { "${install_dir}/phantomjs":
-    ensure => link,
-    target => "${source_dir}/phantomjs/bin/phantomjs",
-    force  => true,
-  }
-
-  if $package_update {
-    exec { 'remove phantomjs':
-      command => "/bin/rm -rf ${source_dir}/phantomjs",
-      notify  => Exec[ 'get phantomjs' ]
-    }
+    ensure  => link,
+    target  => "${source_dir}/phantomjs-${package_version}/bin/phantomjs",
+    force   => true,
+    require => Exec['get phantomjs'],
   }
 }
