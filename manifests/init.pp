@@ -4,7 +4,6 @@ class phantomjs (
   $source_url = undef,
   $source_dir = '/opt',
   $install_dir = '/usr/local/bin',
-  $package_update = false,
   $timeout = 300
 ) {
 
@@ -70,12 +69,5 @@ class phantomjs (
     target  => "${source_dir}/phantomjs-${package_version}/bin/phantomjs",
     force   => true,
     require => Exec['get phantomjs'],
-  }
-
-  if $package_update {
-    exec { 'remove phantomjs':
-      command => "/bin/rm -rf ${source_dir}/phantomjs",
-      notify  => Exec[ 'get phantomjs' ]
-    }
   }
 }
