@@ -4,6 +4,7 @@ class phantomjs::remove (
 ) {
   exec { 'remove phantomjs':
     command => "/bin/rm -rf ${source_dir}/phantomjs-${package_version}",
+    unless  => "/usr/bin/test ! -d ${source_dir}/phantomjs-${package_version}",
     notify  => Exec['get phantomjs']
   }
 }
